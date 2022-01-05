@@ -83,14 +83,12 @@ public class HomeFragment extends Fragment {
         buttonAll.setOnClickListener(view -> {
             Intent i = new Intent(rootView.getContext(), ResultActivity.class);
             startActivity(i);
-            requireActivity().finish();
         });
 
         submit.setOnClickListener(view -> {
             //todo fare check info inserite e passarle
             Intent i = new Intent(rootView.getContext(), ResultActivity.class);
             startActivity(i);
-            requireActivity().finish();
         });
 
 

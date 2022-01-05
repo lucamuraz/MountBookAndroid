@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:padding="6dip" >
+
+    <ImageView
+        android:id="@+id/book_icon"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="6dip"
+        android:layout_marginBottom="0dp"
+        android:contentDescription="@string/todo"
+        app:srcCompat="@drawable/outline_work_outline_24"
+        app:tint="#313033" />
+
+    <TextView
+        android:id="@+id/activity_firstLine"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/pos"
+        android:layout_alignParentTop="true"
+        android:layout_alignWithParentIfMissing="true"
+        android:gravity="center_vertical"
+        android:text="Rifugio"
+        android:textSize="18sp"
+        android:layout_toEndOf="@id/book_icon"
+        android:layout_alignParentEnd="true"
+        android:textColor="@color/black"/>
+
+    <TextView
+        android:id="@+id/activity_secondLinePos"
+        android:layout_width="30dp"
+        android:layout_height="26dip"
+        android:layout_alignParentBottom="true"
+        android:ellipsize="marquee"
+        android:text="152"
+        android:textSize="15sp"
+        android:layout_toEndOf="@id/book_icon"
+        android:singleLine="true"
+        android:textColor="@color/black" />
+
+    <ImageView
+        android:id="@+id/pos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/baseline_thumb_up_24"
+        android:layout_toEndOf="@id/activity_secondLinePos"
+        android:layout_alignBottom="@id/activity_secondLinePos"
+        android:layout_marginBottom="5dp"/>
+
+    <TextView
+        android:id="@+id/activity_secondLineNeg"
+        android:layout_width="30dp"
+        android:layout_height="26dip"
+        android:layout_alignParentBottom="true"
+        android:ellipsize="marquee"
+        android:text="23"
+        android:textSize="15sp"
+        android:layout_toEndOf="@id/pos"
+        android:singleLine="true"
+        android:textColor="@color/black"
+        android:layout_marginStart="20dp"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/baseline_thumb_down_24"
+        android:layout_toEndOf="@id/activity_secondLineNeg"
+        android:layout_alignBottom="@id/activity_secondLinePos"
+        android:layout_marginBottom="5dp"/>
+
+    <View
+        android:id="@+id/divider6"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>

@@ -12,15 +12,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mountbook.Adapter.HutAdapter;
-import com.example.mountbook.Model.Hut;
+import com.example.mountbook.AppManager;
+import com.example.mountbook.Model.Shelter;
 import com.example.mountbook.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ResultActivity extends AppCompatActivity {
+public class ResultActivity extends AppCompatActivity implements  HutAdapter.ItemClickListener{
 
-    List<Hut> resultList = new ArrayList<Hut>();
+    private List<Shelter> resultList=new ArrayList<>();
+    private HutAdapter.ItemClickListener itemClickListener=this;
     RecyclerView recyclerView;
     Context ctx=this;
     Toolbar toolbar;
@@ -30,10 +32,10 @@ public class ResultActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
         recyclerView=findViewById(R.id.hut_list);
-        resultList.add(new Hut("Rifugio1", "info1"));
-        resultList.add(new Hut("Rifugio2", "info2"));
+
+        resultList=AppManager.getInstance().getHutListResult();
         if(!resultList.isEmpty()){
-            HutAdapter adapter = new HutAdapter(resultList); // la visulizzo con l'adpter
+            HutAdapter adapter = new HutAdapter(resultList, itemClickListener); // la visulizzo con l'adpter
             TextView text = findViewById(R.id.testo1);
             text.setVisibility(View.INVISIBLE);
             recyclerView.setHasFixedSize(true);
@@ -44,17 +46,24 @@ public class ResultActivity extends AppCompatActivity {
             text.setVisibility(View.VISIBLE);
         }
         toolbar=findViewById(R.id.toolbar1);
+        toolbar.setNavigationIcon(R.drawable.ic_keyboard_arrow_left_24px);
         getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryVariant, this.getTheme()));
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Rifugi");
+        toolbar.setNavigationOnClickListener(view -> finish());
+    }
+
+    @Override
+    public void onListItemClick(int clickedItemIndex) { //todo
+        Shelter shelter =resultList.get(clickedItemIndex);
+        AppManager.getInstance().setSingleHut(shelter);
+        Intent i = new Intent(ctx, SingleHutActivity.class);
+        startActivity(i);
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Intent i = new Intent(ctx, MainActivity.class);
-        i.putExtra("redirect", 0);
-        startActivity(i);
         finish();
     }
 }

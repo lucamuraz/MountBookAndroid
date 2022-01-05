@@ -4,10 +4,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+
 public class SaveSharedPreferences {
 
     static final String PREF_USER_NAME= "name";
     static final String PREF_USER_PSW= "password";
+    static final String AUTH_MODE= "auth";
 
 
     static SharedPreferences getSharedPreferences(Context ctx) {
@@ -26,12 +29,22 @@ public class SaveSharedPreferences {
         editor.apply();
     }
 
+    public static void setAuthMode(Context ctx, String authMode) {
+        SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
+        editor.putString(AUTH_MODE, authMode);
+        editor.apply();
+    }
+
     public static String getUserName(Context ctx) {
-        return getSharedPreferences(ctx).getString(PREF_USER_NAME, "ll"); //todo
+        return getSharedPreferences(ctx).getString(PREF_USER_NAME, ""); //todo
     }
 
     public static String getUserPassword(Context ctx) {
         return getSharedPreferences(ctx).getString(PREF_USER_PSW, "");
+    }
+
+    public static String getAuthMode(Context ctx) {
+        return getSharedPreferences(ctx).getString(AUTH_MODE, "");
     }
 
     public static void clearData(Context ctx) {
