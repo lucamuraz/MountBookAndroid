@@ -11,6 +11,7 @@ public class SaveSharedPreferences {
     static final String PREF_USER_NAME= "name";
     static final String PREF_USER_PSW= "password";
     static final String AUTH_MODE= "auth";
+    static final String PREF_USER_ID= "userId";
 
 
     static SharedPreferences getSharedPreferences(Context ctx) {
@@ -33,6 +34,16 @@ public class SaveSharedPreferences {
         SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
         editor.putString(AUTH_MODE, authMode);
         editor.apply();
+    }
+
+    public static void setUserId(Context ctx, String userId) {
+        SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
+        editor.putString(PREF_USER_ID, userId);
+        editor.apply();
+    }
+
+    public static String getPrefUserId(Context ctx) {
+        return getSharedPreferences(ctx).getString(PREF_USER_ID,"");
     }
 
     public static String getUserName(Context ctx) {

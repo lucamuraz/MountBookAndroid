@@ -26,6 +26,8 @@ public class ResultActivity extends AppCompatActivity implements  HutAdapter.Ite
     RecyclerView recyclerView;
     Context ctx=this;
     Toolbar toolbar;
+    private int tmp;
+    private Bundle extras;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,6 +53,9 @@ public class ResultActivity extends AppCompatActivity implements  HutAdapter.Ite
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Rifugi");
         toolbar.setNavigationOnClickListener(view -> finish());
+
+        Intent intent=getIntent();
+        extras = intent.getExtras();
     }
 
     @Override
@@ -58,6 +63,7 @@ public class ResultActivity extends AppCompatActivity implements  HutAdapter.Ite
         Shelter shelter =resultList.get(clickedItemIndex);
         AppManager.getInstance().setSingleHut(shelter);
         Intent i = new Intent(ctx, SingleHutActivity.class);
+        i.putExtras(extras);
         startActivity(i);
     }
 

@@ -5,11 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -17,15 +20,27 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
+import androidx.core.util.Pair;
 
 import com.example.mountbook.AppManager;
+import com.example.mountbook.HttpHandler;
 import com.example.mountbook.Model.Reservation;
+import com.example.mountbook.Model.Shelter;
 import com.example.mountbook.R;
+import com.example.mountbook.SaveSharedPreferences;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Random;
 
 public class SingleBookActivity extends AppCompatActivity {
 
@@ -53,17 +68,27 @@ public class SingleBookActivity extends AppCompatActivity {
     CheckBox cat5_f;
     CheckBox cat6_t;
     CheckBox cat6_f;
+    Button delete;
+    boolean [] rating={false,false,false,false,false,false};
+    private String url;
+    List<Pair<String,Object>> json= new ArrayList<>();
+    private boolean del;
+    private Reservation reservation;
+    private boolean init=true;
+    Shelter shelter;
+    String uri;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
         ctx=this;
-        Reservation reservation=AppManager.getInstance().getReservation();
+        reservation=AppManager.getInstance().getReservation();
+        url="http://10.0.2.2:8081/api/v1/shelter/findById?shId="+reservation.getShelterId();
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_singlebook);
         hut_name=findViewById(R.id.prenot_rif);
-        hut_name.setText(reservation.getHut().getTitle());
+//        hut_name.setText(shelter.getName());
 
         date=findViewById(R.id.prenot_date);
         DateFormat dateFormat= new SimpleDateFormat("dd/MM/yyyy", Locale.ITALY);
@@ -85,7 +110,7 @@ public class SingleBookActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(view -> finish());
 
         email=findViewById(R.id.prenot_contact1);
-        email.setText(reservation.getHut().getEmail());
+//        email.setText(shelter.getEmail());
         email.setOnClickListener(view -> {
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("plain/text");
@@ -96,7 +121,7 @@ public class SingleBookActivity extends AppCompatActivity {
         });
 
         phone=findViewById(R.id.prenot_contact2);
-        phone.setText(reservation.getHut().getPhone());
+//        phone.setText(shelter.getTelephoneNumber());
         phone.setOnClickListener(view -> {
 
             if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.CALL_PHONE)== PackageManager.PERMISSION_GRANTED){
@@ -112,18 +137,18 @@ public class SingleBookActivity extends AppCompatActivity {
 
         adress=findViewById(R.id.prenot_adress);
         adress.setOnClickListener(view -> {
-
-            String uri = "http://maps.google.com/maps?q=loc:" + reservation.getHut().getLat() + "," + reservation.getHut().getLon();
+//            String uri = "http://maps.google.com/maps?q=loc:" + shelter.getLatitude() + "," + shelter.getLongitude();
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
             intent.setPackage("com.google.android.apps.maps");
             startActivity(intent);
         });
 
-        eval=findViewById(R.id.card_eval);
+        eval=findViewById(R.id.layer1);
 
         evaluate=findViewById(R.id.evaluate);
         evaluate.setOnClickListener(view -> {
             eval.setVisibility(View.VISIBLE);
+            evaluate.setVisibility(View.INVISIBLE);
         });
 
         cat1_t=findViewById(R.id.cat1_t);
@@ -131,6 +156,7 @@ public class SingleBookActivity extends AppCompatActivity {
             if(cat1_f.isChecked()){
                 cat1_f.setChecked(false);
             }
+            rating[0]=true;
         });
 
         cat1_f=findViewById(R.id.cat1_f);
@@ -138,6 +164,7 @@ public class SingleBookActivity extends AppCompatActivity {
             if(cat1_t.isChecked()){
                 cat1_t.setChecked(false);
             }
+            rating[0]=false;
         });
 
         cat2_t=findViewById(R.id.cat2_t);
@@ -145,6 +172,7 @@ public class SingleBookActivity extends AppCompatActivity {
             if(cat2_f.isChecked()){
                 cat2_f.setChecked(false);
             }
+            rating[1]=true;
         });
 
         cat2_f=findViewById(R.id.cat2_f);
@@ -152,6 +180,7 @@ public class SingleBookActivity extends AppCompatActivity {
             if(cat2_t.isChecked()){
                 cat2_t.setChecked(false);
             }
+            rating[1]=false;
         });
 
         cat3_t=findViewById(R.id.cat3_t);
@@ -159,6 +188,7 @@ public class SingleBookActivity extends AppCompatActivity {
             if(cat3_f.isChecked()){
                 cat3_f.setChecked(false);
             }
+            rating[2]=true;
         });
 
         cat3_f=findViewById(R.id.cat3_f);
@@ -166,6 +196,7 @@ public class SingleBookActivity extends AppCompatActivity {
             if(cat3_t.isChecked()){
                 cat3_t.setChecked(false);
             }
+            rating[2]=false;
         });
 
         cat4_t=findViewById(R.id.cat4_t);
@@ -173,6 +204,7 @@ public class SingleBookActivity extends AppCompatActivity {
             if(cat4_f.isChecked()){
                 cat4_f.setChecked(false);
             }
+            rating[3]=true;
         });
 
         cat4_f=findViewById(R.id.cat4_f);
@@ -180,6 +212,7 @@ public class SingleBookActivity extends AppCompatActivity {
             if(cat4_t.isChecked()){
                 cat4_t.setChecked(false);
             }
+            rating[3]=false;
         });
 
         cat5_t=findViewById(R.id.cat5_t);
@@ -187,6 +220,7 @@ public class SingleBookActivity extends AppCompatActivity {
             if(cat5_f.isChecked()){
                 cat5_f.setChecked(false);
             }
+            rating[4]=true;
         });
 
         cat5_f=findViewById(R.id.cat5_f);
@@ -194,6 +228,7 @@ public class SingleBookActivity extends AppCompatActivity {
             if(cat5_t.isChecked()){
                 cat5_t.setChecked(false);
             }
+            rating[4]=false;
         });
 
         cat6_t=findViewById(R.id.cat6_t);
@@ -201,6 +236,7 @@ public class SingleBookActivity extends AppCompatActivity {
             if(cat6_f.isChecked()){
                 cat6_f.setChecked(false);
             }
+            rating[5]=true;
         });
 
         cat6_f=findViewById(R.id.cat6_f);
@@ -208,6 +244,7 @@ public class SingleBookActivity extends AppCompatActivity {
             if(cat6_t.isChecked()){
                 cat6_t.setChecked(false);
             }
+            rating[5]=false;
         });
 
         evalKo=findViewById(R.id.evaluate_an);
@@ -225,12 +262,35 @@ public class SingleBookActivity extends AppCompatActivity {
             cat6_t.setChecked(false);
             cat6_f.setChecked(false);
             eval.setVisibility(View.INVISIBLE);
+            evaluate.setVisibility(View.VISIBLE);
         });
 
         evalOk=findViewById(R.id.evaluate_ok);
         evalOk.setOnClickListener(view -> {
-            //todo
-            eval.setVisibility(View.INVISIBLE);
+            url="http://10.0.2.2:8081/api/v1/comment/doComment";
+            del=false;
+            init=false;
+            json.clear();
+            json.add(new Pair<>("shelter",shelter.getId()));
+            json.add(new Pair<>("user", SaveSharedPreferences.getPrefUserId(ctx)));
+            json.add(new Pair<>("service",rating[0]));
+            json.add(new Pair<>("clear",rating[1]));
+            json.add(new Pair<>("ospitality",rating[2]));
+            json.add(new Pair<>("food",rating[3]));
+            json.add(new Pair<>("location",rating[4]));
+
+            new FetchDataTask().execute(url);
+        });
+
+        delete=findViewById(R.id.book_delete);
+        delete.setOnClickListener(view -> {
+            url="http://10.0.2.2:8081/api/v1/reservation/deleteReservation";
+            del=true;
+            init=false;
+            json.clear();
+            json.add(new Pair<>("userId", SaveSharedPreferences.getPrefUserId(ctx)));
+            json.add(new Pair<>("reservationId",reservation.getId()));
+            new FetchDataTask().execute(url);
         });
     }
 
@@ -244,5 +304,110 @@ public class SingleBookActivity extends AppCompatActivity {
                 }
             });
 
+    private void loadUi(){
+        hut_name.setText(shelter.getName());
+        phone.setText(shelter.getTelephoneNumber());
+        email.setText(shelter.getEmail());
+        hut_name.setText(shelter.getName());
+        uri = "http://maps.google.com/maps?q=loc:" + shelter.getLatitude() + "," + shelter.getLongitude();
+    }
+
+    private class FetchDataTask extends AsyncTask<String, Void, String> {
+
+        private static final String TAG = "con";
+        private String jsonStr;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+//            Toast.makeText(ctx,"Json Data is downloading",Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            HttpHandler sh = new HttpHandler();
+            if(init){
+                jsonStr = sh.makeGetCall(url);
+            }else{
+                jsonStr = sh.makePostCall(url,json);
+            }
+            Log.e(TAG, "Response from url: " + jsonStr);
+            if(jsonStr == null){
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(ctx,
+                                "Couldn't get json from server. Check LogCat for possible errors!",
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String dataFetched) {
+            if(init){
+                try{
+                    JSONArray jsonMainNode = new JSONArray(jsonStr);
+                    int jsonArrLength = jsonMainNode.length();
+                    DateFormat df1=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+                    for(int i=0; i < jsonArrLength; i++) {
+                        JSONObject js = jsonMainNode.getJSONObject(i);
+                        //todo ricostruire shelter e aggiungere alla lista locale
+                        int id= js.getInt("id");
+                        String name = js.getString("name");
+                        String address = js.getString("address");
+                        String openStr= js.getString("open");
+                        Date open= df1.parse(openStr);
+                        String closeStr= js.getString("close");
+                        Date close= df1.parse(closeStr);
+                        int maxNumBed = js.getInt("maxNumBed");
+                        float altitude = BigDecimal.valueOf(js.getDouble("altitude")).floatValue();
+                        double longitude = js.getDouble("longitude");
+                        double latitude =js.getDouble("latitude");
+                        String phone = String.valueOf(js.getLong("telephoneNumber"));
+                        String webSite = js.getString("webSite");
+                        String email = js.getString("email");
+                        String description = js.getString("description");
+                        int price = js.getInt("price");
+                        int r=new Random().nextInt(3);
+                        int image;
+                        switch (r) {
+                            case 0:
+                                image = R.drawable.hut1;
+                                break;
+                            case 1:
+                                image = R.drawable.hut2;
+                                break;
+                            case 2:
+                                image = R.drawable.hut3;
+                                break;
+                            default:
+                                image = R.drawable.hut1;
+                                break;
+                        }
+                        shelter= new Shelter(id,name,address,open,close,maxNumBed,altitude,latitude,longitude,phone,webSite,email,description,image,34,6,"",price);
+                    }
+                    loadUi();
+                    init=false;
+                }catch(Exception e){
+                        Log.i("App", "Error parsing data" +e.getMessage());
+                }
+            }else if(del){
+                AppManager.getInstance().getReservationList().remove(reservation);
+                Intent i = new Intent(ctx, MainActivity.class);
+                i.putExtra("redirect", 2);
+                startActivity(i);
+                finish();
+            }else{
+                String toastMessage = "Valutazione effettuata!";
+                Toast mToast = Toast.makeText(ctx, toastMessage, Toast.LENGTH_LONG);
+                mToast.show();
+                eval.setVisibility(View.INVISIBLE);
+            }
+        }
+
+    }
 
 }

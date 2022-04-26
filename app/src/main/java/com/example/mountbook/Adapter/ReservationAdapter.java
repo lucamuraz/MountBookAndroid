@@ -43,7 +43,7 @@ public class ReservationAdapter extends
         Reservation reservation = reservationList.get(position); // prense il primo elemeto della lista.
         // prendo gli elementi dalla classe viewholder, dal row_layout e faccio le set.
         TextView textView = holder.titolo;
-        textView.setText(reservation.getHut().getTitle());
+        textView.setText(reservation.getHut());
         TextView textView1 = holder.informazioni;
         DateFormat dateFormat= new SimpleDateFormat("dd/MM/yyyy", Locale.ITALY);
         String dateTxt= dateFormat.format(reservation.getStartDate()) + " - " + dateFormat.format(reservation.getEndDate());

@@ -39,13 +39,11 @@ public class HutAdapter extends
         Shelter shelter = shelterList.get(position); // prense il primo elemeto della lista.
         // prendo gli elementi dalla classe viewholder, dal row_layout e faccio le set.
         TextView textView = holder.titolo;
-        textView.setText(shelter.getTitle());
+        textView.setText(shelter.getName());
         TextView textView1 = holder.pos;
         textView1.setText(String.valueOf(shelter.getPos()));
         TextView textView2 = holder.neg;
         textView2.setText(String.valueOf(shelter.getNeg()));
-//        ImageView imageView = holder.remainder_icon;
-//        imageView.setImageResource(R.drawable.ic_bell1_foreground);
     }
 
     @Override

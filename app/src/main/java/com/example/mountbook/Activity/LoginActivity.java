@@ -3,6 +3,7 @@ package com.example.mountbook.Activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,8 +15,10 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.util.Pair;
 
 
+import com.example.mountbook.HttpHandler;
 import com.example.mountbook.R;
 import com.example.mountbook.SaveSharedPreferences;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -26,12 +29,21 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int RC_SIGN_IN = 12;
     private static final String TAG = "ERRORE";
     String username;
     String password;
+    private String url;
     private CardView cardView;
     private ProgressBar progressBar;
     private Button loginButton;
@@ -39,6 +51,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private TextView registration;
     private SignInButton signInButton;
     private GoogleSignInClient mGoogleSignInClient;
+    List<Pair<String,Object>> json= new ArrayList<>();
+    private String jsonString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +60,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_login);
 
         progressBar=findViewById(R.id.progressBar);
-        cardView=findViewById(R.id.login_form);
+        cardView=findViewById(R.id.signup_form);
         cardView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.INVISIBLE);
         loginButton=findViewById(R.id.login);
@@ -60,12 +74,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             EditText p = findViewById(R.id.password);
             username = u.getText().toString();
             password = p.getText().toString();
-            SaveSharedPreferences.setUserName(ctx, username);
-            SaveSharedPreferences.setUserPassword(ctx, password);
 
-            Intent i = new Intent(this, MainActivity.class);
-            i.putExtra("redirect", 0);
-            startActivity(i);
+            json.clear();
+            json.add(new Pair<>("username",username));
+            json.add(new Pair<>("password",password));
+
+            url="http://10.0.2.2:8081/api/auth/signin"; //todo mettere link per recuperare tutti i rifugi
+            new FetchDataTask().execute();
+
+//            Intent i = new Intent(this, MainActivity.class);
+//            i.putExtra("redirect", 0);
+//            startActivity(i);
         });
 
         registration.setOnClickListener(view -> {
@@ -126,6 +145,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             SaveSharedPreferences.setUserName(this,account.getEmail());
             SaveSharedPreferences.setAuthMode(this, "google");
 
+            json.clear();
+            json.add(new Pair<>("username",account.getDisplayName()));
+            json.add(new Pair<>("email",account.getEmail()));
+            json.add(new Pair<>("role","USER"));
+            json.add(new Pair<>("password","PasswordSegretissima"));
+
+            url="http://10.0.2.2:8081/api/auth/signin"; //todo mettere link per recuperare tutti i rifugi
+            new FetchDataTask().execute(url);
+
             // Signed in successfully, show authenticated UI.
             String toastMessage = "Login effettuato con successo";
             Toast mToast = Toast.makeText(ctx, toastMessage, Toast.LENGTH_LONG);
@@ -140,6 +168,56 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             String toastMessage = "Login fallito. Riprovare";
             Toast mToast = Toast.makeText(ctx, toastMessage, Toast.LENGTH_LONG);
             mToast.show();
+            Intent i = new Intent(ctx, LoginActivity.class);
+            startActivity(i);
+        }
+    }
+
+    private class FetchDataTask extends AsyncTask<String, Void, String> {
+
+        private static final String TAG = "con";
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+//            Toast.makeText(ctx,"Json Data is downloading",Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            HttpHandler sh = new HttpHandler();
+            jsonString = sh.makePostCall(url,json);
+            Log.e(TAG, "Response from url: " + jsonString);
+
+            if(jsonString == null){
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(ctx,
+                                "Login fallito. Riprovare",
+                                Toast.LENGTH_LONG).show();
+                        Intent i = new Intent(ctx, LoginActivity.class);
+                        startActivity(i);
+                    }
+                });
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String dataFetched) {
+            //parse the JSON data and then display
+            try{
+                JSONObject js=new JSONObject(jsonString);
+                SaveSharedPreferences.setUserId(ctx, String.valueOf(js.getInt("id")));
+                SaveSharedPreferences.setUserName(ctx, username);
+                SaveSharedPreferences.setUserPassword(ctx, password);
+                Intent i = new Intent(ctx, MainActivity.class);
+                i.putExtra("redirect", 0);
+                startActivity(i);
+            }catch(Exception e){
+                Log.i("App", "Error parsing data" +e.getMessage());
+            }
         }
     }
 }
