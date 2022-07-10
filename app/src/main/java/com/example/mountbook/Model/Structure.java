@@ -3,7 +3,7 @@ package com.example.mountbook.Model;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Shelter {
+public class Structure {
 
     //todo
     private int id;
@@ -21,12 +21,13 @@ public class Shelter {
     private String description;
     private int image;
     private int price;
+    private int type;
 
     private int pos;
     private int neg;
     private String services;
 
-    public Shelter(int id, String name, String address, Date open, Date close, int maxNumBed, float altitude, double longitude, double latitude, String telephoneNumber, String webSite, String email, String description, int image, int pos, int neg, String services, int price) {
+    public Structure(int id, String name, String address, Date open, Date close, int maxNumBed, float altitude, double longitude, double latitude, String telephoneNumber, String webSite, String email, String description, int image, int pos, int neg, String services, int price, int type) {
         this.image = image;
         this.name = name;
         this.description = description;
@@ -45,6 +46,7 @@ public class Shelter {
         this.close = close;
         this.maxNumBed = maxNumBed;
         this.price=price;
+        this.type=type;
     }
     public String getName() {
         return name;
@@ -148,4 +150,6 @@ public class Shelter {
     public void setPrice(int price) { this.price = price; }
 
     public int getPrice() { return price; }
+
+    public int getType() { return type; }
 }

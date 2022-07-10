@@ -4,29 +4,18 @@ import java.util.Date;
 
 public class Reservation {
 
-    private String shelterName;
-    private Shelter shelter;
-    private long shelterId;
-    private long bivouacId;
+    private String structureName;
+    private Structure structure;
+    private long structureId;
     private Date startDate;
     private Date endDate;
     private int guest;
     private int id;
     private String user;
 
-//    public Reservation(Date startDate, int guest, Shelter shelter, Date endDate, int id, String user) {
-//        this.shelter = shelter;
-//        this.endDate = endDate;
-//        this.id = id;
-//        this.user = user;
-//        this.guest = guest;
-//        this.startDate = startDate;
-//    }
-
-    public Reservation(String shelterName, long shelterId, long bivouacId, Date startDate, Date endDate, int guest, int id, String user) {
-        this.shelterName = shelterName;
-        this.shelterId = shelterId;
-        this.bivouacId = bivouacId;
+    public Reservation(String structureName, long structureId, Date startDate, Date endDate, int guest, int id, String user) {
+        this.structureName = structureName;
+        this.structureId = structureId;
         this.startDate = startDate;
         this.endDate = endDate;
         this.guest = guest;
@@ -51,13 +40,15 @@ public class Reservation {
 
     public void setEndDate(Date endDate) { this.endDate = endDate; }
 
-    public String getHut() { return shelterName; }
+    public String getHut() { return structureName; }
 
-    public void setHut(Shelter shelter) { this.shelter = shelter; }
+    public void setHut(Structure structure) { this.structure = structure; }
 
     public String getUser() { return user; }
 
     public void setUser(String user) { this.user = user; }
 
-    public long getShelterId() { return shelterId; }
+    public long getStructureId() { return structureId; }
+
+    public String getStructureName() { return structureName; }
 }

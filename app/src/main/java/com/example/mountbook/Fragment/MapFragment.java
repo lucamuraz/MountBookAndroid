@@ -18,7 +18,7 @@ import androidx.fragment.app.Fragment;
 import com.example.mountbook.Activity.SingleHutActivity;
 import com.example.mountbook.AppManager;
 import com.example.mountbook.HttpHandler;
-import com.example.mountbook.Model.Shelter;
+import com.example.mountbook.Model.Structure;
 import com.example.mountbook.R;
 
 import org.json.JSONArray;
@@ -52,7 +52,7 @@ public class MapFragment extends Fragment {
     TextView cardPos;
     TextView cardNeg;
     private String url;
-    private List<Shelter> shelterList;
+    private List<Structure> structureList;
     private String jsonString;
     private IMapController imapController;
     private ImageView imageView;
@@ -105,7 +105,7 @@ public class MapFragment extends Fragment {
         map.getOverlays().add(mLocationOverlay);
 
 
-        url="http://10.0.2.2:8081/api/v1/shelter/findAll"; //todo mettere link per recuperare tutti i rifugi
+        url="/api/v1/find/findAllStructure"; //todo mettere link per recuperare tutti i rifugi
         new FetchDataTask().execute(url);
 
 
@@ -124,9 +124,9 @@ public class MapFragment extends Fragment {
         ArrayList<OverlayItem> items = new ArrayList<>();
         //todo prendere lista di tutti i rifugi e estrarre info necessarie oer creare overlayItem
 
-        for (Shelter shelter : shelterList) {
-            String label=shelter.getAltitude()+" mt.";
-            items.add(new OverlayItem(shelter.getName(), label, new GeoPoint(shelter.getLatitude(), shelter.getLongitude())));
+        for (Structure structure : structureList) {
+            String label= structure.getAltitude()+" mt.";
+            items.add(new OverlayItem(structure.getName(), label, new GeoPoint(structure.getLatitude(), structure.getLongitude())));
         }
 
 //the overlay
@@ -135,7 +135,7 @@ public class MapFragment extends Fragment {
                     @Override
                     public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
                         //do something
-                        AppManager.getInstance().setSingleHut(shelterList.get(index));
+                        AppManager.getInstance().setSingleHut(structureList.get(index));
                         cardTitle.setText(AppManager.getInstance().getSingleHut().getName());
                         cardNeg.setText(String.valueOf(AppManager.getInstance().getSingleHut().getNeg()));
                         cardPos.setText(String.valueOf(AppManager.getInstance().getSingleHut().getPos()));
@@ -197,7 +197,7 @@ public class MapFragment extends Fragment {
         @Override
         protected void onPostExecute(String dataFetched) {
             //parse the JSON data and then display
-            shelterList=new ArrayList<>();
+            structureList =new ArrayList<>();
             try{
                 JSONArray jsonMainNode = new JSONArray(jsonString);
                 int jsonArrLength = jsonMainNode.length();
@@ -216,11 +216,18 @@ public class MapFragment extends Fragment {
                     float altitude = BigDecimal.valueOf(js.getDouble("altitude")).floatValue();
                     double longitude = js.getDouble("longitude");
                     double latitude = js.getDouble("latitude");
-                    String phone = String.valueOf(js.getLong("telephoneNumber"));
-                    String webSite = js.getString("webSite");
-                    String email = js.getString("email");
                     String description = js.getString("description");
-                    int price = js.getInt("price");
+                    int type=js.getInt("type");
+                    String phone = "";
+                    String webSite = "";
+                    String email = "";
+                    int price = 0;
+                    if(type==0){
+                        phone = String.valueOf(js.getLong("telephoneNumber"));
+                        webSite = js.getString("webSite");
+                        email = js.getString("email");
+                        price = js.getInt("price");
+                    }
                     int r=new Random().nextInt(3);
                     int image;
                     switch (r){
@@ -237,7 +244,7 @@ public class MapFragment extends Fragment {
                             image=R.drawable.hut1;
                             break;
                     }
-                    shelterList.add(new Shelter(id,name,address,open,close,maxNumBed,altitude,latitude,longitude,phone,webSite,email,description,image,34,6,"pernottamento",price));
+                    structureList.add(new Structure(id,name,address,open,close,maxNumBed,altitude,latitude,longitude,phone,webSite,email,description,image,34,6,"pernottamento",price,type));
                 }
                 loadMap();
             }catch(Exception e){
@@ -249,10 +256,10 @@ public class MapFragment extends Fragment {
     private GeoPoint centerMap(){
         double sumLat=0;
         double sumLon=0;
-        for (Shelter sh:shelterList) {
+        for (Structure sh: structureList) {
             sumLon+=sh.getLongitude();
             sumLat+=sh.getLatitude();
         }
-        return  new GeoPoint((sumLat/shelterList.size()),(sumLon/shelterList.size()));
+        return  new GeoPoint((sumLat/ structureList.size()),(sumLon/ structureList.size()));
     }
 }

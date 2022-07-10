@@ -29,7 +29,7 @@ import androidx.fragment.app.Fragment;
 import com.example.mountbook.Activity.ResultActivity;
 import com.example.mountbook.AppManager;
 import com.example.mountbook.HttpHandler;
-import com.example.mountbook.Model.Shelter;
+import com.example.mountbook.Model.Structure;
 import com.example.mountbook.R;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
@@ -60,7 +60,7 @@ public class HomeFragment extends Fragment {
     String jsonFromServer;
     private String url;
     List<Pair<String,Object>> json= new ArrayList<>();
-    List<Shelter> results;
+    List<Structure> results;
     EditText services;
     boolean postCall=true;
     private String[] serviceList= {"Wi-Fi", "Noleggio attrezzatura", "Raggiungibile in macchina"};
@@ -189,19 +189,10 @@ public class HomeFragment extends Fragment {
 
 
         buttonAll.setOnClickListener(view -> {
-            url="http://10.0.2.2:8081/api/v1/shelter/findAll";
+            url="/api/v1/find/findAllStructure";
             postCall=false;
             new FetchDataTask().execute(url);
-//            Intent i = new Intent(requireActivity(), ResultActivity.class);
-//            i.putExtra("type", 0);
-//            startActivity(i);
         });
-
-//        rangeSlider.setOnClickListener(view -> {
-//            List<Float> values=rangeSlider.getValues();
-//            String txt=String.valueOf(values.get(0))+" - "+String.valueOf(values.get(1));
-//            price.setText(txt);
-//        });
 
         rangeSlider.addOnChangeListener(new RangeSlider.OnChangeListener() {
             @SuppressLint("RestrictedApi")
@@ -225,7 +216,7 @@ public class HomeFragment extends Fragment {
 
             List<Float> values=rangeSlider.getValues();
 
-            url="http://10.0.2.2:8081/api/v1/find/findStructure"; //todo mettere link per ricerca rifugi
+            url="/api/v1/find/findStructure"; //todo mettere link per ricerca rifugi
             postCall=true;
             json.clear();
             json.add(new Pair<>("type",typ));
@@ -307,14 +298,13 @@ public class HomeFragment extends Fragment {
         @Override
         protected void onPostExecute(String dataFetched) {
             //parse the JSON data and then display
-            List<Shelter> shelterList=new ArrayList<>();
+            List<Structure> structureList =new ArrayList<>();
             try{
                 JSONArray jsonMainNode = new JSONArray(jsonStr);
                 int jsonArrLength = jsonMainNode.length();
                 DateFormat df1=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
                 for(int i=0; i < jsonArrLength; i++) {
                     JSONObject js = jsonMainNode.getJSONObject(i);
-                    //todo ricostruire shelter e aggiungere alla lista locale
                     int id= js.getInt("id");
                     String name = js.getString("name");
                     String address = js.getString("address");
@@ -326,11 +316,18 @@ public class HomeFragment extends Fragment {
                     float altitude = BigDecimal.valueOf(js.getDouble("altitude")).floatValue();
                     double longitude = js.getDouble("longitude");
                     double latitude =js.getDouble("latitude");
-                    String phone = String.valueOf(js.getLong("telephoneNumber"));
-                    String webSite = js.getString("webSite");
-                    String email = js.getString("email");
                     String description = js.getString("description");
-                    int price = js.getInt("price");
+                    int type=js.getInt("type");
+                    String phone = "";
+                    String webSite = "";
+                    String email = "";
+                    int price = 0;
+                    if(type==0){
+                        phone = String.valueOf(js.getLong("telephoneNumber"));
+                        webSite = js.getString("webSite");
+                        email = js.getString("email");
+                        price = js.getInt("price");
+                    }
                     int r=new Random().nextInt(3);
                     int image;
                     switch (r) {
@@ -347,9 +344,9 @@ public class HomeFragment extends Fragment {
                             image = R.drawable.hut1;
                             break;
                     }
-                    shelterList.add(new Shelter(id,name,address,open,close,maxNumBed,altitude,latitude,longitude,phone,webSite,email,description,image,34,6,"",price));
+                    structureList.add(new Structure(id,name,address,open,close,maxNumBed,altitude,latitude,longitude,phone,webSite,email,description,image,34,6,"",price,type));
                 }
-                AppManager.getInstance().setHutListResult(shelterList);
+                AppManager.getInstance().setHutListResult(structureList);
                 Intent i = new Intent(requireActivity(), ResultActivity.class);
                 if(postCall){
                     SimpleDateFormat simpleDateFormat=new SimpleDateFormat("dd/MM/yyyy");
@@ -367,24 +364,5 @@ public class HomeFragment extends Fragment {
                 Log.i("App", "Error parsing data" +e.getMessage());
             }
         }
-
     }
-
-//    private void parseJSON(String data){
-//        try{
-//            JSONArray jsonMainNode = new JSONArray(data);
-//            int jsonArrLength = jsonMainNode.length();
-//            for(int i=0; i < jsonArrLength; i++) {
-//                JSONObject jsonChildNode = jsonMainNode.getJSONObject(i);
-//                //todo ricostruire shelter e aggiungere alla lista locale
-//                String name = jsonChildNode.getString("name");
-//                String age = jsonChildNode.getString("age");
-//                //results.add(new Shelter(""))
-//            }
-//
-//        }catch(Exception e){
-//            Log.i("App", "Error parsing data" +e.getMessage());
-//
-//        }
-//    }
 }

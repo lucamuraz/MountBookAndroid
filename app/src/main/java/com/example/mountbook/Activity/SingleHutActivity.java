@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,7 +29,7 @@ import androidx.core.util.Pair;
 import com.example.mountbook.AppManager;
 import com.example.mountbook.HttpHandler;
 import com.example.mountbook.Model.Reservation;
-import com.example.mountbook.Model.Shelter;
+import com.example.mountbook.Model.Structure;
 import com.example.mountbook.R;
 import com.example.mountbook.SaveSharedPreferences;
 import com.google.android.material.datepicker.MaterialDatePicker;
@@ -50,12 +49,8 @@ import org.osmdroid.views.overlay.OverlayItem;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.Period;
-import java.time.ZoneId;
-import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -82,7 +77,7 @@ public class SingleHutActivity extends AppCompatActivity {
     private List<Pair<String,Object>> json= new ArrayList<>();
     private Reservation res;
     private boolean post=true;
-    private Shelter shelter;
+    private Structure structure;
     private String jsonStr="";
     private String start;
     private String end;
@@ -103,7 +98,7 @@ public class SingleHutActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_singlehut);
-        shelter = AppManager.getInstance().getSingleHut();
+        structure = AppManager.getInstance().getSingleHut();
 
         CardView confirm = findViewById(R.id.confirm);
         CardView book = findViewById(R.id.card_button);
@@ -121,20 +116,20 @@ public class SingleHutActivity extends AppCompatActivity {
         priceTxt=findViewById(R.id.priceTxt2);
 
         TextView hut_name = findViewById(R.id.hut_name);
-        hut_name.setText(shelter.getName());
+        hut_name.setText(structure.getName());
         TextView hut_info = findViewById(R.id.hut_info);
-        hut_info.setText(shelter.getDescription());
+        hut_info.setText(structure.getDescription());
         TextView hut_desc = findViewById(R.id.hut_desc);
-        hut_desc.setText(shelter.getDescr());
+        hut_desc.setText(structure.getDescr());
         hut_service = findViewById(R.id.hut_service);
-        hut_service.setText(shelter.getServices());
+        hut_service.setText(structure.getServices());
         hut_email=findViewById(R.id.hut_contact1);
-        hut_email.setText(shelter.getEmail());
+        hut_email.setText(structure.getEmail());
         hut_phone=findViewById(R.id.hut_contact2);
-        hut_phone.setText(shelter.getTelephoneNumber());
+        hut_phone.setText(structure.getTelephoneNumber());
 
         cover=findViewById(R.id.imageView2);
-        cover.setImageResource(shelter.getImage());
+        cover.setImageResource(structure.getImage());
 
         Toolbar toolbar = findViewById(R.id.toolbar7);
         toolbar.setNavigationIcon(R.drawable.ic_keyboard_arrow_left_24px);
@@ -155,12 +150,12 @@ public class SingleHutActivity extends AppCompatActivity {
         map.setMultiTouchControls(true);
         IMapController mapController = map.getController();
         mapController.setZoom(9.5);
-        GeoPoint startPoint = new GeoPoint(shelter.getLatitude(), shelter.getLongitude());
+        GeoPoint startPoint = new GeoPoint(structure.getLatitude(), structure.getLongitude());
         mapController.setCenter(startPoint);
         Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
 
         ArrayList<OverlayItem> items = new ArrayList<>();
-        items.add(new OverlayItem(shelter.getName(), shelter.getDescr(), new GeoPoint(shelter.getLatitude(), shelter.getLongitude())));
+        items.add(new OverlayItem(structure.getName(), structure.getDescr(), new GeoPoint(structure.getLatitude(), structure.getLongitude())));
         ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<>(items,
                 new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
                     @Override
@@ -218,7 +213,7 @@ public class SingleHutActivity extends AppCompatActivity {
             date.setText(materialDatePicker.getHeaderText());
             date1=new Date(selection.first);
             date2=new Date(selection.second);
-            if(date1.before(shelter.getOpen())||date2.after(shelter.getClose())||date1.before(new Date())){
+            if(date1.before(structure.getOpen())||date2.after(structure.getClose())||date1.before(new Date())){
                 alert.setVisibility(View.VISIBLE);
             }else{
                 alert.setVisibility(View.INVISIBLE);
@@ -256,7 +251,7 @@ public class SingleHutActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             int day= Period.between(d,d2).getDays();
-            int pr=shelter.getPrice()*extras.getInt("guest")*day;
+            int pr= structure.getPrice()*extras.getInt("guest")*day;
             price.setText(String.valueOf(pr)+" €");
             price.setVisibility(View.VISIBLE);
             priceTxt.setVisibility(View.VISIBLE);
@@ -303,7 +298,7 @@ public class SingleHutActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 int day= Period.between(d,d2).getDays();
-                int pr=shelter.getPrice()*extras.getInt("guest")*day;
+                int pr= structure.getPrice()*extras.getInt("guest")*day;
                 price.setText(String.valueOf(pr));
                 price.setVisibility(View.VISIBLE);
                 priceTxt.setVisibility(View.VISIBLE);
@@ -312,12 +307,15 @@ public class SingleHutActivity extends AppCompatActivity {
             alert.setVisibility(View.INVISIBLE);
         });
 
-        url="http://10.0.2.2:8081/api/v1/service/getServicesForShelter?shelterId="+shelter.getId();
-        post=false;
-        new FetchDataTask().execute(url);
+        if(structure.getType()==1){
+            url="/api/v1/service/getServicesForShelter?shelterId="+ structure.getId();
+            post=false;
+            new FetchDataTask().execute(url);
+        }
+
 
         confirmBook.setOnClickListener(view -> {
-            url="http://10.0.2.2:8081/api/v1/reservation/doReservation"; //todo mettere link per prenotare
+            url="/api/v1/reservation/doReservation"; //todo mettere link per prenotare
             post=true;
 
             //Date date2=new Date(startDate);
@@ -330,7 +328,7 @@ public class SingleHutActivity extends AppCompatActivity {
             json.add(new Pair<>("guests",guest));
             json.add(new Pair<>("firstDay",start));
             json.add(new Pair<>("lastDay",end));
-            json.add(new Pair<>("shelter",shelter.getId()));
+            json.add(new Pair<>("structure", structure.getId()));
 
             new FetchDataTask().execute(url);
         });
@@ -343,7 +341,7 @@ public class SingleHutActivity extends AppCompatActivity {
                 LocalDate d=LocalDate.parse(start, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
                 LocalDate d2=LocalDate.parse(end, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
                 int day= Period.between(d,d2).getDays();
-                int pr=shelter.getPrice()*Integer.parseInt(hosts.getSelectedItem().toString().substring(0,1))*day;
+                int pr= structure.getPrice()*Integer.parseInt(hosts.getSelectedItem().toString().substring(0,1))*day;
                 price.setText(String.valueOf(pr)+" €");
                 price.setVisibility(View.VISIBLE);
                 confirmBook.setVisibility(View.VISIBLE);
@@ -428,7 +426,7 @@ public class SingleHutActivity extends AppCompatActivity {
                         int id= jsonChildNode.getInt("id");
                         Date st=simpleDateFormat.parse(jsonChildNode.getString("firstDay"));
                         Date en=simpleDateFormat.parse(jsonChildNode.getString("lastDay"));
-                        res=new Reservation(shelter.getName(),shelter.getId(), 0,st,en,guest,id, SaveSharedPreferences.getUserName(ctx));
+                        res=new Reservation(structure.getName(), structure.getId(),st,en,guest,id, SaveSharedPreferences.getUserName(ctx));
                     }
                 }catch (Exception e){
                     Log.i("App", "Error parsing data" +e.getMessage());
@@ -448,12 +446,12 @@ public class SingleHutActivity extends AppCompatActivity {
                         res[0] = jsonChildNode.getBoolean("wifi");
                         res[1] = jsonChildNode.getBoolean("equipment");
                         res[2] = jsonChildNode.getBoolean("car");
-                        shelter.setServices(res);
+                        structure.setServices(res);
                     }
                 }catch (Exception e){
                     Log.i("App", "Error parsing data" +e.getMessage());
                 }
-                hut_service.setText(shelter.getServices());
+                hut_service.setText(structure.getServices());
             }
         }
     }

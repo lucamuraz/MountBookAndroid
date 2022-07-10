@@ -28,9 +28,10 @@ public class HttpHandler {
     }
 
     public String makeGetCall(String reqUrl) {
+        String urln="http://10.0.2.2:8081"+reqUrl;
         String response = null;
         try {
-            URL url = new URL(reqUrl);
+            URL url = new URL(urln);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
@@ -57,9 +58,10 @@ public class HttpHandler {
     }
 
     public String makeGetCallJson(String reqUrl, List<Pair<String, Object>> json ){
+        String urln="http://10.0.2.2:8081"+reqUrl;
         String response = null;
         try {
-            URL url = new URL(reqUrl);
+            URL url = new URL(urln);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
@@ -99,9 +101,10 @@ public class HttpHandler {
     }
 
     public String makePostCall(String reqUrl, List<Pair<String, Object>> json ){
+        String urln="http://10.0.2.2:8081"+reqUrl;
         String response = null;
         try {
-            URL url = new URL(reqUrl);
+            URL url = new URL(urln);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");

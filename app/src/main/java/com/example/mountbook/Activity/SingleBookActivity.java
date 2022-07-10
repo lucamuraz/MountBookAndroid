@@ -25,7 +25,7 @@ import androidx.core.util.Pair;
 import com.example.mountbook.AppManager;
 import com.example.mountbook.HttpHandler;
 import com.example.mountbook.Model.Reservation;
-import com.example.mountbook.Model.Shelter;
+import com.example.mountbook.Model.Structure;
 import com.example.mountbook.R;
 import com.example.mountbook.SaveSharedPreferences;
 
@@ -75,7 +75,7 @@ public class SingleBookActivity extends AppCompatActivity {
     private boolean del;
     private Reservation reservation;
     private boolean init=true;
-    Shelter shelter;
+    Structure structure;
     String uri;
 
     @Override
@@ -83,7 +83,7 @@ public class SingleBookActivity extends AppCompatActivity {
 
         ctx=this;
         reservation=AppManager.getInstance().getReservation();
-        url="http://10.0.2.2:8081/api/v1/shelter/findById?shId="+reservation.getShelterId();
+        url="/api/v1/shelter/findById?shId="+reservation.getStructureId();
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_singlebook);
@@ -110,7 +110,6 @@ public class SingleBookActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(view -> finish());
 
         email=findViewById(R.id.prenot_contact1);
-//        email.setText(shelter.getEmail());
         email.setOnClickListener(view -> {
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("plain/text");
@@ -121,7 +120,6 @@ public class SingleBookActivity extends AppCompatActivity {
         });
 
         phone=findViewById(R.id.prenot_contact2);
-//        phone.setText(shelter.getTelephoneNumber());
         phone.setOnClickListener(view -> {
 
             if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.CALL_PHONE)== PackageManager.PERMISSION_GRANTED){
@@ -137,7 +135,6 @@ public class SingleBookActivity extends AppCompatActivity {
 
         adress=findViewById(R.id.prenot_adress);
         adress.setOnClickListener(view -> {
-//            String uri = "http://maps.google.com/maps?q=loc:" + shelter.getLatitude() + "," + shelter.getLongitude();
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
             intent.setPackage("com.google.android.apps.maps");
             startActivity(intent);
@@ -267,11 +264,11 @@ public class SingleBookActivity extends AppCompatActivity {
 
         evalOk=findViewById(R.id.evaluate_ok);
         evalOk.setOnClickListener(view -> {
-            url="http://10.0.2.2:8081/api/v1/comment/doComment";
+            url="/api/v1/comment/doComment";
             del=false;
             init=false;
             json.clear();
-            json.add(new Pair<>("shelter",shelter.getId()));
+            json.add(new Pair<>("structure", reservation.getStructureId()));
             json.add(new Pair<>("user", SaveSharedPreferences.getPrefUserId(ctx)));
             json.add(new Pair<>("service",rating[0]));
             json.add(new Pair<>("clear",rating[1]));
@@ -284,7 +281,7 @@ public class SingleBookActivity extends AppCompatActivity {
 
         delete=findViewById(R.id.book_delete);
         delete.setOnClickListener(view -> {
-            url="http://10.0.2.2:8081/api/v1/reservation/deleteReservation";
+            url="/api/v1/reservation/deleteReservation";
             del=true;
             init=false;
             json.clear();
@@ -305,11 +302,11 @@ public class SingleBookActivity extends AppCompatActivity {
             });
 
     private void loadUi(){
-        hut_name.setText(shelter.getName());
-        phone.setText(shelter.getTelephoneNumber());
-        email.setText(shelter.getEmail());
-        hut_name.setText(shelter.getName());
-        uri = "http://maps.google.com/maps?q=loc:" + shelter.getLatitude() + "," + shelter.getLongitude();
+        hut_name.setText(structure.getName());
+        phone.setText(structure.getTelephoneNumber());
+        email.setText(structure.getEmail());
+        hut_name.setText(structure.getName());
+        uri = "http://maps.google.com/maps?q=loc:" + structure.getLatitude() + "," + structure.getLongitude();
     }
 
     private class FetchDataTask extends AsyncTask<String, Void, String> {
@@ -366,11 +363,18 @@ public class SingleBookActivity extends AppCompatActivity {
                         float altitude = BigDecimal.valueOf(js.getDouble("altitude")).floatValue();
                         double longitude = js.getDouble("longitude");
                         double latitude =js.getDouble("latitude");
-                        String phone = String.valueOf(js.getLong("telephoneNumber"));
-                        String webSite = js.getString("webSite");
-                        String email = js.getString("email");
                         String description = js.getString("description");
-                        int price = js.getInt("price");
+                        int type=js.getInt("type");
+                        String phone = "";
+                        String webSite = "";
+                        String email = "";
+                        int price = 0;
+                        if(type==0){
+                            phone = String.valueOf(js.getLong("telephoneNumber"));
+                            webSite = js.getString("webSite");
+                            email = js.getString("email");
+                            price = js.getInt("price");
+                        }
                         int r=new Random().nextInt(3);
                         int image;
                         switch (r) {
@@ -387,7 +391,7 @@ public class SingleBookActivity extends AppCompatActivity {
                                 image = R.drawable.hut1;
                                 break;
                         }
-                        shelter= new Shelter(id,name,address,open,close,maxNumBed,altitude,latitude,longitude,phone,webSite,email,description,image,34,6,"",price);
+                        structure = new Structure(id,name,address,open,close,maxNumBed,altitude,latitude,longitude,phone,webSite,email,description,image,34,6,"",price,type);
                     }
                     loadUi();
                     init=false;

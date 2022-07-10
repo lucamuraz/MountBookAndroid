@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mountbook.Adapter.HutAdapter;
 import com.example.mountbook.AppManager;
-import com.example.mountbook.Model.Shelter;
+import com.example.mountbook.Model.Structure;
 import com.example.mountbook.R;
 
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ import java.util.List;
 
 public class ResultActivity extends AppCompatActivity implements  HutAdapter.ItemClickListener{
 
-    private List<Shelter> resultList=new ArrayList<>();
+    private List<Structure> resultList=new ArrayList<>();
     private HutAdapter.ItemClickListener itemClickListener=this;
     RecyclerView recyclerView;
     Context ctx=this;
@@ -60,8 +60,8 @@ public class ResultActivity extends AppCompatActivity implements  HutAdapter.Ite
 
     @Override
     public void onListItemClick(int clickedItemIndex) { //todo
-        Shelter shelter =resultList.get(clickedItemIndex);
-        AppManager.getInstance().setSingleHut(shelter);
+        Structure structure =resultList.get(clickedItemIndex);
+        AppManager.getInstance().setSingleHut(structure);
         Intent i = new Intent(ctx, SingleHutActivity.class);
         i.putExtras(extras);
         startActivity(i);

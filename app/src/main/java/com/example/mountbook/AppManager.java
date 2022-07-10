@@ -3,7 +3,7 @@ package com.example.mountbook;
 
 import android.content.Context;
 
-import com.example.mountbook.Model.Shelter;
+import com.example.mountbook.Model.Structure;
 import com.example.mountbook.Model.Reservation;
 import com.google.android.material.navigation.NavigationBarView;
 
@@ -14,9 +14,9 @@ public class AppManager {
     private static AppManager singleInstance;
     private NavigationBarView navigationBarView;
     private Context ctx;
-    private List<Shelter> shelterListResult =new ArrayList<>();
-    private List<Shelter> shelterListAll = new ArrayList<>();
-    private Shelter singleShelter;
+    private List<Structure> structureListResult =new ArrayList<>();
+    private List<Structure> structureListAll = new ArrayList<>();
+    private Structure singleStructure;
     private Reservation reservation;
     private List<Reservation> reservationList;
 
@@ -43,28 +43,28 @@ public class AppManager {
         this.navigationBarView = navigationBarView;
     }
 
-    public void setHutListResult(List<Shelter> shelterListResult) {
-        this.shelterListResult = shelterListResult;
+    public void setHutListResult(List<Structure> structureListResult) {
+        this.structureListResult = structureListResult;
     }
 
-    public List<Shelter> getHutListResult() {
-        return shelterListResult;
+    public List<Structure> getHutListResult() {
+        return structureListResult;
     }
 
-    public List<Shelter> getHutListAll() {
-        return shelterListAll;
+    public List<Structure> getHutListAll() {
+        return structureListAll;
     }
 
-    public void setHutListAll(List<Shelter> shelterListAll) {
-        this.shelterListAll = shelterListAll;
+    public void setHutListAll(List<Structure> structureListAll) {
+        this.structureListAll = structureListAll;
     }
 
-    public Shelter getSingleHut() {
-        return singleShelter;
+    public Structure getSingleHut() {
+        return singleStructure;
     }
 
-    public void setSingleHut(Shelter singleShelter) {
-        this.singleShelter = singleShelter;
+    public void setSingleHut(Structure singleStructure) {
+        this.singleStructure = singleStructure;
     }
 
     public Reservation getReservation() {

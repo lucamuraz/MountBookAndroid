@@ -79,7 +79,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             json.add(new Pair<>("username",username));
             json.add(new Pair<>("password",password));
 
-            url="http://10.0.2.2:8081/api/auth/signin"; //todo mettere link per recuperare tutti i rifugi
+            url="/api/auth/signin";
             new FetchDataTask().execute();
 
 //            Intent i = new Intent(this, MainActivity.class);
@@ -151,7 +151,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             json.add(new Pair<>("role","USER"));
             json.add(new Pair<>("password","PasswordSegretissima"));
 
-            url="http://10.0.2.2:8081/api/auth/signin"; //todo mettere link per recuperare tutti i rifugi
+            url="/api/auth/signin";
             new FetchDataTask().execute(url);
 
             // Signed in successfully, show authenticated UI.

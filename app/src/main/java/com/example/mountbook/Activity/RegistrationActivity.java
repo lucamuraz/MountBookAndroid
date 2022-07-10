@@ -88,7 +88,7 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
             json.add(new Pair<>("email", email));
             json.add(new Pair<>("password",password));
 
-            url="http://10.0.2.2:8081/api/auth/signup"; //todo mettere link per recuperare tutti i rifugi
+            url="/api/auth/signup"; //todo mettere link per recuperare tutti i rifugi
             new FetchDataTask().execute();
 
         });
@@ -139,7 +139,7 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
             json.add(new Pair<>("role","USER"));
             json.add(new Pair<>("password","PasswordSegretissima"));
 
-            url="http://10.0.2.2:8081/api/auth/signup"; //todo mettere link per recuperare tutti i rifugi
+            url="/api/auth/signup"; //todo mettere link per recuperare tutti i rifugi
             new FetchDataTask().execute(url);
 
             // Signed in successfully, show authenticated UI.

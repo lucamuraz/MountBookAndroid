@@ -10,7 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.mountbook.Model.Shelter;
+import com.example.mountbook.Model.Structure;
 import com.example.mountbook.R;
 
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.List;
 public class HutAdapter extends
         RecyclerView.Adapter<HutAdapter.ViewHolder> {
 
-    private List<Shelter> shelterList;
+    private List<Structure> structureList;
     final private ItemClickListener onClickListener;
 
     @NonNull
@@ -36,19 +36,19 @@ public class HutAdapter extends
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
-        Shelter shelter = shelterList.get(position); // prense il primo elemeto della lista.
+        Structure structure = structureList.get(position); // prense il primo elemeto della lista.
         // prendo gli elementi dalla classe viewholder, dal row_layout e faccio le set.
         TextView textView = holder.titolo;
-        textView.setText(shelter.getName());
+        textView.setText(structure.getName());
         TextView textView1 = holder.pos;
-        textView1.setText(String.valueOf(shelter.getPos()));
+        textView1.setText(String.valueOf(structure.getPos()));
         TextView textView2 = holder.neg;
-        textView2.setText(String.valueOf(shelter.getNeg()));
+        textView2.setText(String.valueOf(structure.getNeg()));
     }
 
     @Override
     public int getItemCount() {
-        return shelterList.size();
+        return structureList.size();
     }
 
 
@@ -82,8 +82,8 @@ public class HutAdapter extends
         void onListItemClick(int clickedItemIndex);
     }
 
-    public HutAdapter(List<Shelter> shelterList, ItemClickListener onClickListener){
-        this.shelterList = shelterList;
+    public HutAdapter(List<Structure> structureList, ItemClickListener onClickListener){
+        this.structureList = structureList;
         this.onClickListener = onClickListener;
     }
 

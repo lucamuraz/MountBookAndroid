@@ -20,20 +20,17 @@ import com.example.mountbook.Adapter.ReservationAdapter;
 import com.example.mountbook.AppManager;
 import com.example.mountbook.HttpHandler;
 import com.example.mountbook.Model.Reservation;
-import com.example.mountbook.Model.Shelter;
 import com.example.mountbook.R;
 import com.example.mountbook.SaveSharedPreferences;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 public class BookedFragment extends Fragment implements  ReservationAdapter.ItemClickListener{
 
@@ -65,7 +62,7 @@ public class BookedFragment extends Fragment implements  ReservationAdapter.Item
         rootView = inflater.inflate(R.layout.fragment_booked, container, false);
         ctx=rootView.getContext();
         String userId=SaveSharedPreferences.getPrefUserId(ctx);
-        url="http://10.0.2.2:8081/api/v1/reservation/getReservationForUser?userId="+userId; //todo mettere link per recuperare tutti le prenotazioni
+        url="/api/v1/reservation/getReservationForUser?userId="+userId; //todo mettere link per recuperare tutti le prenotazioni
         new FetchDataTask().execute(url);
 //        reservationList=AppManager.getInstance().getReservationList();
 //        loadUi();
@@ -126,10 +123,9 @@ public class BookedFragment extends Fragment implements  ReservationAdapter.Item
                         String closeStr= js.getString("lastDay");
                         Date end= df1.parse(closeStr);
                         String name= js.getString("name");
-                        long shId=js.getLong("shelterId");
-                        long bvId= 0;
+                        long shId=js.getLong("structureId");
                         String user= SaveSharedPreferences.getUserName(ctx);
-                        reservationList.add(new Reservation(name,shId,bvId,start,end,guest,id,user));
+                        reservationList.add(new Reservation(name,shId,start,end,guest,id,user));
                     }
                 }
                 AppManager.getInstance().setReservationList(reservationList);

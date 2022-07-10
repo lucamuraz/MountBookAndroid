@@ -9,13 +9,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.example.mountbook.AppManager;
-import com.example.mountbook.Model.Shelter;
+import com.example.mountbook.Model.Structure;
 import com.example.mountbook.Model.Reservation;
 import com.example.mountbook.R;
 import com.example.mountbook.SaveSharedPreferences;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @SuppressLint("CustomSplashScreen")
@@ -30,7 +29,7 @@ public class SplashActivity extends AppCompatActivity {
         final Context ctx = this;
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
-        List<Shelter> listShelter =new ArrayList<>();
+        List<Structure> listStructure =new ArrayList<>();
 //        listShelter.add(new Shelter(1, "Rifugio1", "Monpantero (Susa), seguire indicazioni La riposa", new Date(2021,12,31), new Date(2021,12,31), 45,2130,7.674824,45.191018, "393489970549", "www.rifugio.it","info@rifugio.it","Da Susa imboccare (segnalazioni) la carrozzabile che sale ad Urbiano, fraz. di Mompantero; da qui si continua sulla strada ex militare, asfaltata per un buon tratto, che consente di raggiungere, con percorso tortuoso ma molto panoramico, i ruderi dell'ex forte la Riposa 2205 m (20 km circa da Susa",null, 34, 6,"pernottamento"));
 //        listShelter.add(new Shelter(2, "Rifugio2", "Monpantero (Susa), seguire indicazioni La riposa", new Date(2021,12,31), new Date(2021,12,31), 45,2130,7.674824,45.291018, "393489970549", "www.rifugio.it","info@rifugio.it","Da Susa imboccare (segnalazioni) la carrozzabile che sale ad Urbiano, fraz. di Mompantero; da qui si continua sulla strada ex militare, asfaltata per un buon tratto, che consente di raggiungere, con percorso tortuoso ma molto panoramico, i ruderi dell'ex forte la Riposa 2205 m (20 km circa da Susa",null, 34, 6,"pernottamento"));
 //        listShelter.add(new Shelter(3, "Rifugio3", "Monpantero (Susa), seguire indicazioni La riposa", new Date(2021,12,31), new Date(2021,12,31), 45,2130,7.674824,45.391018, "393489970549", "www.rifugio.it","info@rifugio.it","Da Susa imboccare (segnalazioni) la carrozzabile che sale ad Urbiano, fraz. di Mompantero; da qui si continua sulla strada ex militare, asfaltata per un buon tratto, che consente di raggiungere, con percorso tortuoso ma molto panoramico, i ruderi dell'ex forte la Riposa 2205 m (20 km circa da Susa",null, 34, 6,"pernottamento"));
@@ -39,8 +38,8 @@ public class SplashActivity extends AppCompatActivity {
 //        listShelter.add(new Shelter(6, "Rifugio6", "Monpantero (Susa), seguire indicazioni La riposa", new Date(2021,12,31), new Date(2021,12,31), 45,2130,7.674824,45.691018, "393489970549", "www.rifugio.it","info@rifugio.it","Da Susa imboccare (segnalazioni) la carrozzabile che sale ad Urbiano, fraz. di Mompantero; da qui si continua sulla strada ex militare, asfaltata per un buon tratto, che consente di raggiungere, con percorso tortuoso ma molto panoramico, i ruderi dell'ex forte la Riposa 2205 m (20 km circa da Susa",null, 34, 6,"pernottamento"));
 
         //set the list as empty every time app is open
-        AppManager.getInstance().setHutListResult(listShelter);
-        AppManager.getInstance().setHutListAll(listShelter);
+        AppManager.getInstance().setHutListResult(listStructure);
+        AppManager.getInstance().setHutListAll(listStructure);
 
         List<Reservation> reservationList=new ArrayList<>();
 //        reservationList.add(new Reservation(new Date(2021, 12, 1), 6, listShelter.get(2), new Date(2021, 12, 5), 1, "Giampaolo1" ));
