@@ -36,6 +36,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -53,6 +54,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private GoogleSignInClient mGoogleSignInClient;
     List<Pair<String,Object>> json= new ArrayList<>();
     private String jsonString;
+    EditText u;
+    EditText p;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,12 +69,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         loginButton=findViewById(R.id.login);
         registration=findViewById(R.id.registrazione);
         signInButton=findViewById(R.id.sign_in_button);
+        u = findViewById(R.id.username);
+        p = findViewById(R.id.password);
+
 
         loginButton.setOnClickListener(view -> {
             cardView.setVisibility(View.INVISIBLE);
             progressBar.setVisibility(View.VISIBLE);
-            EditText u = findViewById(R.id.username);
-            EditText p = findViewById(R.id.password);
             username = u.getText().toString();
             password = p.getText().toString();
 
@@ -81,10 +85,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             url="/api/auth/signin";
             new FetchDataTask().execute();
-
-//            Intent i = new Intent(this, MainActivity.class);
-//            i.putExtra("redirect", 0);
-//            startActivity(i);
         });
 
         registration.setOnClickListener(view -> {
@@ -142,34 +142,35 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            SaveSharedPreferences.setUserName(this,account.getEmail());
+            SaveSharedPreferences.setUserName(this,account.getDisplayName());
             SaveSharedPreferences.setAuthMode(this, "google");
 
             json.clear();
             json.add(new Pair<>("username",account.getDisplayName()));
             json.add(new Pair<>("email",account.getEmail()));
-            json.add(new Pair<>("role","USER"));
             json.add(new Pair<>("password","PasswordSegretissima"));
 
-            url="/api/auth/signin";
+            u.setText(SaveSharedPreferences.getUserName(ctx));
+            p.setText("PasswordSegretissima");
+
+            url="/api/auth/signup";
             new FetchDataTask().execute(url);
 
             // Signed in successfully, show authenticated UI.
-            String toastMessage = "Login effettuato con successo";
+            String toastMessage = "Registrazione effettuata con successo";
             Toast mToast = Toast.makeText(ctx, toastMessage, Toast.LENGTH_LONG);
             mToast.show();
-            Intent i = new Intent(this, MainActivity.class);
-            i.putExtra("redirect", 0);
-            startActivity(i);
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-            String toastMessage = "Login fallito. Riprovare";
-            Toast mToast = Toast.makeText(ctx, toastMessage, Toast.LENGTH_LONG);
-            mToast.show();
-            Intent i = new Intent(ctx, LoginActivity.class);
-            startActivity(i);
+//            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+//            String toastMessage = "Login fallito. Riprovare";
+//            Toast mToast = Toast.makeText(ctx, toastMessage, Toast.LENGTH_LONG);
+//            mToast.show();
+//            Intent i = new Intent(ctx, LoginActivity.class);
+//            startActivity(i);
+            u.setText(SaveSharedPreferences.getUserName(ctx));
+            p.setText("PasswordSegretissima");
         }
     }
 
@@ -194,7 +195,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void run() {
                         Toast.makeText(ctx,
-                                "Login fallito. Riprovare",
+                                "B Login fallito. Riprovare",
                                 Toast.LENGTH_LONG).show();
                         Intent i = new Intent(ctx, LoginActivity.class);
                         startActivity(i);

@@ -29,6 +29,7 @@ import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class RegistrationActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -50,6 +51,8 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        SaveSharedPreferences.setAuthMode(this, "");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
 
@@ -58,30 +61,27 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
         cardView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.INVISIBLE);
         loginButton=findViewById(R.id.registrate);
-        signInButton=findViewById(R.id.sign_in_button2);
 
-        /***************** GOOGLE SIGN IN ***********************/
-        // Configure sign-in to request the user's ID, email address, and basic
-        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
-        // Build a GoogleSignInClient with the options specified by gso.
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
-        signInButton.setOnClickListener(this);
-        /*************************************************************/
 
         loginButton.setOnClickListener(view -> {
-            cardView.setVisibility(View.INVISIBLE);
-            progressBar.setVisibility(View.VISIBLE);
             EditText u = findViewById(R.id.username_up);
             EditText p = findViewById(R.id.password_up);
             EditText e= findViewById(R.id.email_up);
-            username = u.getText().toString();
-            password = p.getText().toString();
-            email = e.getText().toString();
+            if(!Objects.equals(SaveSharedPreferences.getAuthMode(ctx), "google")){
+                u = findViewById(R.id.username_up);
+                p = findViewById(R.id.password_up);
+                e= findViewById(R.id.email_up);
+                username = u.getText().toString();
+                password = p.getText().toString();
+                email = e.getText().toString();
+            }else{
+                u.setText(username);
+                p.setText(password);
+                e.setText(email);
+            }
+            cardView.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
+
 
             json.clear();
             json.add(new Pair<>("username",username));
@@ -130,25 +130,13 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            SaveSharedPreferences.setUserName(this,account.getEmail());
+            SaveSharedPreferences.setUserName(this,account.getDisplayName());
             SaveSharedPreferences.setAuthMode(this, "google");
 
-            json.clear();
-            json.add(new Pair<>("username",account.getDisplayName()));
-            json.add(new Pair<>("email",account.getEmail()));
-            json.add(new Pair<>("role","USER"));
-            json.add(new Pair<>("password","PasswordSegretissima"));
+            username=account.getDisplayName();
+            password="PasswordSegretissima";
+            email=account.getEmail();
 
-            url="/api/auth/signup"; //todo mettere link per recuperare tutti i rifugi
-            new FetchDataTask().execute(url);
-
-            // Signed in successfully, show authenticated UI.
-            String toastMessage = "Registrazione effettuata con successo";
-            Toast mToast = Toast.makeText(ctx, toastMessage, Toast.LENGTH_LONG);
-            mToast.show();
-            Intent i = new Intent(this, MainActivity.class);
-            i.putExtra("redirect", 0);
-            startActivity(i);
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
@@ -191,31 +179,23 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
         @Override
         protected void onPostExecute(String dataFetched) {
             //parse the JSON data and then display
+            if(Objects.equals(SaveSharedPreferences.getAuthMode(ctx), "google")){
 
-            String toastMessage = "Login effettuato con successo";
-            Toast mToast = Toast.makeText(ctx, toastMessage, Toast.LENGTH_LONG);
-            mToast.show();
-            Intent i = new Intent(ctx, LoginActivity.class);
-            startActivity(i);
-//            String id="";
-//            try{
-//                JSONArray jsonMainNode = new JSONArray(jsonString);
-//                int jsonArrLength = jsonMainNode.length();
-//                DateFormat df1=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-//                for(int i=0; i < jsonArrLength; i++) {
-//                    JSONObject js = jsonMainNode.getJSONObject(i);
-//                    //todo ricostruire shelter e aggiungere alla lista locale
-//                    id= String.valueOf(js.getInt("id"));
-//                }
-//                SaveSharedPreferences.setUserId(ctx, id);
-//                SaveSharedPreferences.setUserName(ctx, username);
-//                SaveSharedPreferences.setUserPassword(ctx, password);
-//                Intent i = new Intent(ctx, LoginActivity.class);
-//                i.putExtra("redirect", 0);
-//                startActivity(i);
-//            }catch(Exception e){
-//                Log.i("App", "Error parsing data" +e.getMessage());
-//            }
+                String toastMessage = "Login effettuato con successo";
+                Toast mToast = Toast.makeText(ctx, toastMessage, Toast.LENGTH_LONG);
+                mToast.show();
+                Intent i = new Intent(ctx, MainActivity.class);
+                i.putExtra("redirect", 0);
+                startActivity(i);
+            }else{
+                String toastMessage = "Registrazione effettuato con successo";
+                Toast mToast = Toast.makeText(ctx, toastMessage, Toast.LENGTH_LONG);
+                mToast.show();
+                Intent i = new Intent(ctx, LoginActivity.class);
+                startActivity(i);
+            }
+
+
         }
     }
 }

@@ -300,8 +300,15 @@ public class HomeFragment extends Fragment {
             //parse the JSON data and then display
             List<Structure> structureList =new ArrayList<>();
             try{
-                JSONArray jsonMainNode = new JSONArray(jsonStr);
-                int jsonArrLength = jsonMainNode.length();
+                JSONArray jsonMainNode1 = new JSONArray(jsonStr);
+                int jsonArrLength = jsonMainNode1.length();
+                JSONArray jsonMainNode;
+                if(jsonArrLength==1){
+                    jsonMainNode = new JSONArray(jsonStr).getJSONArray(0);
+                }else{
+                    jsonMainNode = new JSONArray(jsonStr);
+                }
+                jsonArrLength = jsonMainNode.length();
                 DateFormat df1=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
                 for(int i=0; i < jsonArrLength; i++) {
                     JSONObject js = jsonMainNode.getJSONObject(i);
